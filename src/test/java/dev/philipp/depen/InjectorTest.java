@@ -32,7 +32,7 @@ public class InjectorTest {
 	@Test
 	public void testOptional() {
 		Injector injector = new Injector();
-		injector.inject(new InjectionToken<>(BigDecimal.class, ResolutionScope.CLASS), true);
+		injector.inject(new InjectionToken<>(BigDecimal.class, ResolutionScope.CLASS), true, new ClassTrace());
 		
 	}
 	
@@ -52,7 +52,7 @@ public class InjectorTest {
 		InjectionToken<StringBuilder> fileToken1 = new InjectionToken<>(StringBuilder.class, ResolutionScope.INSTANCE);
 		injector.provide(fileToken1, new ClassInjectable<StringBuilder>(StringBuilder.class));
 		InjectionToken<StringBuilder> fileToken2 = new InjectionToken<>(StringBuilder.class, ResolutionScope.CLASS);
-		StringBuilder wronglyInjected = injector.inject(fileToken2, true);
+		StringBuilder wronglyInjected = injector.inject(fileToken2, true, new ClassTrace());
 		assertNull(wronglyInjected);
 		StringBuilder injected = injector.inject(fileToken1);
 		assertNotNull(injected);
@@ -64,7 +64,7 @@ public class InjectorTest {
 		InjectionToken<BigDecimal> bdToken1 = new InjectionToken<>(BigDecimal.class, ResolutionScope.INSTANCE);
 		injector.provide(bdToken1, new ValueInjectable<BigDecimal>(BigDecimal.TEN));
 		InjectionToken<BigDecimal> bdToken2 = new InjectionToken<>(BigDecimal.class, ResolutionScope.CLASS);
-		BigDecimal wronglyInjected = injector.inject(bdToken2, true);
+		BigDecimal wronglyInjected = injector.inject(bdToken2, true, new ClassTrace());
 		assertNull(wronglyInjected);
 		BigDecimal injected = injector.inject(bdToken1);
 		assertEquals(BigDecimal.TEN, injected);
