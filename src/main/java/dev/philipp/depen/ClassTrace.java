@@ -16,8 +16,9 @@ public class ClassTrace {
     public void push(Class<?> value) {
         if (set.add(value)) {
             stack.push(value);
+        } else {
+        	throw new CircularDependencyException(this, value);        	
         }
-        throw new CircularDependencyException(this, value);
     }
 
     public Class<?> pop() {
@@ -29,10 +30,12 @@ public class ClassTrace {
     public boolean contains(Class<?> value) {
         return set.contains(value);
     }
-
-	public Deque<Class<?>> getClasses() {
-		return stack;
+	
+	@Override
+	public String toString() {
+		return stack.stream()
+        .map(Class::getSimpleName)
+        .reduce((a, b) -> a + " -> " + b)
+        .orElse("");
 	}
-    
-    
 }

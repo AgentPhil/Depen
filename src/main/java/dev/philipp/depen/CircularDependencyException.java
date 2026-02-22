@@ -9,13 +9,8 @@ public class CircularDependencyException extends InjectionException {
 	}
 
 	private static String buildMessage(ClassTrace trace, Class<?> value) {
-	    String chain = trace.getClasses().stream()
-	            .map(Class::getSimpleName)
-	            .reduce((a, b) -> a + " -> " + b)
-	            .orElse("");
-
-	    return "Circular dependency detected: " +
-	           chain + " -> " + value.getSimpleName();
+	    return "Circular dependency detected: " + value.getSimpleName() + " -> " + 
+	    		trace.toString();
 	}
 
 	

@@ -8,9 +8,9 @@ import dev.philipp.depen.Injector.ResolutionContext;
 
 public class ClassInjectable<T> extends Injectable<T> {
 
-    private final Class<? extends T> clazz;
+    private final Class<T> clazz;
 
-    ClassInjectable(Class<? extends T> clazz) {
+    ClassInjectable(Class<T> clazz) {
         this.clazz = clazz;
     }
 
@@ -35,13 +35,16 @@ public class ClassInjectable<T> extends Injectable<T> {
 			Constructor<T> customConstructor = constructors[0];
 			Class<?>[] paramTypes = new Class[customConstructor.getParameterCount()];
 			Object[] params = new Object[paramTypes.length];
+			resolutionContext.classTrace.push(this.clazz);
 			for (int i = 0; i < customConstructor.getParameters().length; i++) {
 				Parameter parameter = customConstructor.getParameters()[i];
-				resolutionContext.classTrace.push(parameter.getType());
+				//resolutionContext.classTrace.push(parameter.getType());
 				params[i] = resolutionContext.inject(new InjectionToken<>(parameter.getType(), ResolutionScope.CLASS), false, resolutionContext.classTrace);
-				resolutionContext.classTrace.pop();
+				//resolutionContext.classTrace.pop();
 			}
+			resolutionContext.classTrace.pop();
 			T newInstance = customConstructor.newInstance(params);
+			resolutionContext.forClass(this.clazz).provideValue(newInstance);
 			//injectionCycle.provide(new Inje, injectable);
 			//TODO inject Annotation based stuff
         	//TODO Annotation at parameter?

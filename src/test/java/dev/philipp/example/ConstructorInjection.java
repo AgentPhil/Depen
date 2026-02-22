@@ -37,7 +37,16 @@ public class ConstructorInjection {
 		Injector injector = new Injector();
 		injector.provide(CircleAExample.class);
 		injector.provide(CircleBExample.class);
+		injector.provide(CircleCExample.class);
+		injector.provide(CircleDExample.class);
 		injector.inject(CircleAExample.class);
+	}
+	
+	@Test(expected = CircularDependencyException.class)
+	public void testSelfInjection() {
+		Injector injector = new Injector();
+		injector.provide(OneClassCircle.class);
+		injector.inject(OneClassCircle.class);
 	}
 	
 	
@@ -73,7 +82,23 @@ public class ConstructorInjection {
 	}
 	
 	public static class CircleBExample {
-		public CircleBExample(CircleAExample stringBuilder) {
+		public CircleBExample(CircleCExample c) {
+		}
+	}
+	
+	public static class CircleCExample {
+		public CircleCExample(CircleDExample d) {
+		}
+	}
+	
+	public static class CircleDExample {
+		public CircleDExample(CircleAExample a) {
+		}
+	}
+	
+	public static class OneClassCircle {
+		public OneClassCircle(OneClassCircle me) {
+			
 		}
 	}
 }

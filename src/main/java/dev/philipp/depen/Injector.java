@@ -70,8 +70,9 @@ public class Injector {
 			this.token = token;
     	}
     	
-    	public void provideClass(Class<? extends T> clazz) {
-    		Injector.this.provide(this.token, new ClassInjectable<T>(clazz));
+    	@SuppressWarnings("rawtypes")
+		public void provideClass(Class<? extends T> clazz) {
+    		Injector.this.provide(this.token, new ClassInjectable(clazz));
     	}
     	
     	public void provideValue(T value) {
