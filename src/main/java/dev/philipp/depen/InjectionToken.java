@@ -11,8 +11,19 @@ public class InjectionToken<T> {
     private final Class<T> clazz;
     
     private final ResolutionScope scope;
+    
+    /**
+     * Creates a new Token for token-instance based resolution. The provided value/class will only be accessible by
+     * providing this exact instance of the InjectionToken
+     * @param <T> type of the provided value
+     * @param clazz class of the provided value, String is allowed
+     * @return
+     */
+    public static <T> InjectionToken<T> create(Class<T> clazz) {
+    	return new InjectionToken<T>(clazz, ResolutionScope.INSTANCE);
+    }
 
-    public InjectionToken(Class<T> clazz, ResolutionScope scope) {
+    InjectionToken(Class<T> clazz, ResolutionScope scope) {
         this.clazz = clazz;
         this.scope = scope;
     }

@@ -38,5 +38,31 @@ public class InjectorTest {
 		StringBuilder injected = injector.inject(fileToken2);
 		assertNotNull(injected);
 	}
+	
+	@Test
+	public void testProvideClassWithInstanceResolution() {
+		Injector injector = new Injector();
+		InjectionToken<StringBuilder> fileToken1 = new InjectionToken<StringBuilder>(StringBuilder.class, ResolutionScope.INSTANCE);
+		injector.provide(fileToken1, new ClassInjectable<StringBuilder>(StringBuilder.class));
+		InjectionToken<StringBuilder> fileToken2 = new InjectionToken<StringBuilder>(StringBuilder.class, ResolutionScope.CLASS);
+		StringBuilder wronglyInjected = injector.injectOptional(fileToken2);
+		assertNull(wronglyInjected);
+		StringBuilder injected = injector.inject(fileToken1);
+		assertNotNull(injected);
+	}
+	
+	@Test
+	public void testProvideValueWithInstanceResolution() {
+		Injector injector = new Injector();
+		InjectionToken<BigDecimal> bdToken1 = new InjectionToken<BigDecimal>(BigDecimal.class, ResolutionScope.INSTANCE);
+		injector.provide(bdToken1, new ValueInjectable<BigDecimal>(BigDecimal.TEN));
+		InjectionToken<BigDecimal> bdToken2 = new InjectionToken<BigDecimal>(BigDecimal.class, ResolutionScope.CLASS);
+		BigDecimal wronglyInjected = injector.injectOptional(bdToken2);
+		assertNull(wronglyInjected);
+		BigDecimal injected = injector.inject(bdToken1);
+		assertEquals(BigDecimal.TEN, injected);
+	}
+	
+	
 
 }

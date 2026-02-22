@@ -2,14 +2,14 @@ package dev.philipp.depen;
 
 public class ClassInjectable<T> extends Injectable<T> {
 
-    private final Class<T> clazz;
+    private final Class<? extends T> clazz;
 
-    public ClassInjectable(Class<T> clazz) {
+    ClassInjectable(Class<? extends T> clazz) {
         this.clazz = clazz;
     }
 
     @Override
-    public T get() {
+    T get() {
         try {
             return this.clazz.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
