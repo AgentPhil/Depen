@@ -32,14 +32,18 @@ public class Injector {
     	return this.inject(new InjectionToken<>(clazz, ResolutionScope.CLASS), true);
     }
     
+    public <T> T inject(InjectionToken<T> token) {
+    	return this.inject(token, false);
+    }
+    
+    public <T> T injectOptional(InjectionToken<T> token) {
+    	return this.inject(token, true);
+    }
+    
     <T> void provide(InjectionToken<T> token, Injectable<T> injectable) {
         this.injectables.put(token, injectable);
     }
     
-    <T> T inject(InjectionToken<T> token) {
-    	return this.inject(token, false);
-    }
-
     @SuppressWarnings("unchecked")
     <T> T inject(InjectionToken<T> token, boolean optional) {
     	if (token == null) {

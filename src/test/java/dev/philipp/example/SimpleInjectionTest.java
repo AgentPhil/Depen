@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.Test;
 
 import dev.philipp.depen.InjectionException;
+import dev.philipp.depen.InjectionToken;
 import dev.philipp.depen.Injector;
 
 public class SimpleInjectionTest {
@@ -27,11 +28,13 @@ public class SimpleInjectionTest {
 		injector.inject(StringBuilder.class);
 	}
 	
+	@Test
 	public void testInjectOptional() {
 		Injector injector = new Injector();
 		assertNull(injector.injectOptional(StringBuilder.class));
 	}
 	
+	@Test
 	public void testProvideValue() {
 		Injector injector = new Injector();
 		injector.forClass(BigDecimal.class).provideValue(BigDecimal.TEN);
@@ -39,6 +42,7 @@ public class SimpleInjectionTest {
 		assertEquals(BigDecimal.TEN, injected);
 	}
 	
+	@Test
 	public void testProvideInheritedClass() {
 		Injector injector = new Injector();
 		injector.forClass(List.class).provideClass(ArrayList.class);
@@ -46,8 +50,30 @@ public class SimpleInjectionTest {
 		assertEquals(ArrayList.class, injected.getClass());
 	}
 	
+	@Test
+	public void testInjectionToken() {
+		Injector injector = new Injector();
+		InjectionToken<BigDecimal> myToken = InjectionToken.create(BigDecimal.class, "MY_TOKEN");
+		injector.forToken(myToken).provideValue(BigDecimal.TEN);
+		BigDecimal injected = injector.inject(myToken);
+		assertEquals(BigDecimal.TEN, injected);
+	}
 	
+	@Test
+	public void testDuplicateInjectionToken() {
+		Injector injector = new Injector();
+		InjectionToken<BigDecimal> myToken = InjectionToken.create(BigDecimal.class, "MY_TOKEN");
+		injector.forToken(myToken).provideValue(BigDecimal.TEN);
+		InjectionToken<BigDecimal> mySecondToken = InjectionToken.create(BigDecimal.class, "MY_TOKEN");
+		BigDecimal injected = injector.injectOptional(mySecondToken);
+		assertNull(injected);
+	}
 	
+	@Test(expected = InjectionException.class)
+	public void testNoTokenInjectionException() {
+		Injector injector = new Injector();
+		InjectionToken<BigDecimal> myToken = InjectionToken.create(BigDecimal.class, "MY_TOKEN");
+		injector.inject(myToken);
+	}
 	
-
 }

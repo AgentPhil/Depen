@@ -66,7 +66,7 @@ public class InjectionToken<T> {
     	if (this.scope == ResolutionScope.CLASS) {
     		return "Class " + this.clazz.getName();    		
     	} else {
-    		return "Token " + this.description + " of type " + this.clazz.getName() +  " not provided";    		
+    		return "Token " + this.description + " of type " + this.clazz.getName();    		
     	}
     }
 }
