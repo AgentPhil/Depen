@@ -13,7 +13,7 @@ public class InjectorTest {
 	@Test
 	public void testProvideClass() {
 		Injector injector = new Injector();
-		InjectionToken<StringBuilder> fileToken = new InjectionToken<StringBuilder>(StringBuilder.class, ResolutionScope.CLASS);
+		InjectionToken<StringBuilder> fileToken = new InjectionToken<>(StringBuilder.class, ResolutionScope.CLASS);
 		injector.provide(fileToken, new ClassInjectable<StringBuilder>(StringBuilder.class));
 		StringBuilder injected = injector.inject(fileToken);
 		assertNotNull(injected);
@@ -22,7 +22,7 @@ public class InjectorTest {
 	@Test
 	public void testProvideValue() {
 		Injector injector = new Injector();
-		InjectionToken<BigDecimal> bdToken = new InjectionToken<BigDecimal>(BigDecimal.class, ResolutionScope.CLASS);
+		InjectionToken<BigDecimal> bdToken = new InjectionToken<>(BigDecimal.class, ResolutionScope.CLASS);
 		injector.provide(bdToken, new ValueInjectable<BigDecimal>(new BigDecimal(42)));
 		BigDecimal injected = injector.inject(bdToken);
 		assertNotNull(injected);
@@ -30,11 +30,18 @@ public class InjectorTest {
 	}
 	
 	@Test
+	public void testOptional() {
+		Injector injector = new Injector();
+		injector.inject(new InjectionToken<>(BigDecimal.class, ResolutionScope.CLASS), true);
+		
+	}
+	
+	@Test
 	public void testProvideClassWithDifferentTokens() {
 		Injector injector = new Injector();
-		InjectionToken<StringBuilder> fileToken1 = new InjectionToken<StringBuilder>(StringBuilder.class, ResolutionScope.CLASS);
+		InjectionToken<StringBuilder> fileToken1 = new InjectionToken<>(StringBuilder.class, ResolutionScope.CLASS);
 		injector.provide(fileToken1, new ClassInjectable<StringBuilder>(StringBuilder.class));
-		InjectionToken<StringBuilder> fileToken2 = new InjectionToken<StringBuilder>(StringBuilder.class, ResolutionScope.CLASS);
+		InjectionToken<StringBuilder> fileToken2 = new InjectionToken<>(StringBuilder.class, ResolutionScope.CLASS);
 		StringBuilder injected = injector.inject(fileToken2);
 		assertNotNull(injected);
 	}
@@ -42,10 +49,10 @@ public class InjectorTest {
 	@Test
 	public void testProvideClassWithInstanceResolution() {
 		Injector injector = new Injector();
-		InjectionToken<StringBuilder> fileToken1 = new InjectionToken<StringBuilder>(StringBuilder.class, ResolutionScope.INSTANCE);
+		InjectionToken<StringBuilder> fileToken1 = new InjectionToken<>(StringBuilder.class, ResolutionScope.INSTANCE);
 		injector.provide(fileToken1, new ClassInjectable<StringBuilder>(StringBuilder.class));
-		InjectionToken<StringBuilder> fileToken2 = new InjectionToken<StringBuilder>(StringBuilder.class, ResolutionScope.CLASS);
-		StringBuilder wronglyInjected = injector.injectOptional(fileToken2);
+		InjectionToken<StringBuilder> fileToken2 = new InjectionToken<>(StringBuilder.class, ResolutionScope.CLASS);
+		StringBuilder wronglyInjected = injector.inject(fileToken2, true);
 		assertNull(wronglyInjected);
 		StringBuilder injected = injector.inject(fileToken1);
 		assertNotNull(injected);
@@ -54,15 +61,27 @@ public class InjectorTest {
 	@Test
 	public void testProvideValueWithInstanceResolution() {
 		Injector injector = new Injector();
-		InjectionToken<BigDecimal> bdToken1 = new InjectionToken<BigDecimal>(BigDecimal.class, ResolutionScope.INSTANCE);
+		InjectionToken<BigDecimal> bdToken1 = new InjectionToken<>(BigDecimal.class, ResolutionScope.INSTANCE);
 		injector.provide(bdToken1, new ValueInjectable<BigDecimal>(BigDecimal.TEN));
-		InjectionToken<BigDecimal> bdToken2 = new InjectionToken<BigDecimal>(BigDecimal.class, ResolutionScope.CLASS);
-		BigDecimal wronglyInjected = injector.injectOptional(bdToken2);
+		InjectionToken<BigDecimal> bdToken2 = new InjectionToken<>(BigDecimal.class, ResolutionScope.CLASS);
+		BigDecimal wronglyInjected = injector.inject(bdToken2, true);
 		assertNull(wronglyInjected);
 		BigDecimal injected = injector.inject(bdToken1);
 		assertEquals(BigDecimal.TEN, injected);
 	}
 	
+	@Test
+	public void testSelfInjection() throws Exception {
+		Injector injector = new Injector();
+		Injector injector2 = injector.inject(new InjectionToken<>(Injector.class, ResolutionScope.CLASS));
+		assertEquals(injector, injector2);
+	}
+	
+	@Test(expected = InjectionException.class)
+	public void testNoValueProvided() throws Exception {
+		Injector injector = new Injector();
+		injector.inject(new InjectionToken<>(StringBuilder.class, ResolutionScope.CLASS));
+	}
 	
 
 }

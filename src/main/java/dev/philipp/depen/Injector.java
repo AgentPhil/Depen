@@ -24,32 +24,39 @@ public class Injector {
     	this.forClass(clazz).provideClass(clazz);
     }
     
+    public <T> T inject(Class<T> clazz) {
+    	return this.inject(new InjectionToken<>(clazz, ResolutionScope.CLASS));
+    }
+    
+    public <T> T injectOptional(Class<T> clazz) {
+    	return this.inject(new InjectionToken<>(clazz, ResolutionScope.CLASS), true);
+    }
+    
     <T> void provide(InjectionToken<T> token, Injectable<T> injectable) {
         this.injectables.put(token, injectable);
     }
+    
+    <T> T inject(InjectionToken<T> token) {
+    	return this.inject(token, false);
+    }
 
     @SuppressWarnings("unchecked")
-    <T> T inject(InjectionToken<T> token) {
+    <T> T inject(InjectionToken<T> token, boolean optional) {
     	if (token == null) {
     		throw new IllegalArgumentException("Null-Token not possible");
     	}
         Injectable<?> injectable = this.injectables.get(token);
         if (injectable == null) {
-        	throw new InjectionException(token.toString() + " not provided");
+        	if (optional) {
+        		return null;
+        	} else {
+        		throw new InjectionException(token.toString() + " not provided");        		
+        	}
         }
 		return (T) injectable.get();
     }
     
-    @SuppressWarnings("unchecked")
-    <T> T injectOptional(InjectionToken<T> token) {
-        Injectable<?> injectable = this.injectables.get(token);
-        if (injectable == null) {
-        	return null;
-        }
-		return (T) injectable.get();
-    }
-    
-    class InjectionPoint<T> {
+    public class InjectionPoint<T> {
     	
     	private final InjectionToken<T> token;
     	
