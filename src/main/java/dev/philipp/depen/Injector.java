@@ -1,8 +1,7 @@
 package dev.philipp.depen;
 
-import java.util.ArrayList;
+import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import dev.philipp.depen.InjectionToken.ResolutionScope;
@@ -26,7 +25,11 @@ public class Injector {
     	this.forClass(clazz).provideClass(clazz);
     }
     
-    public <T> T inject(Class<T> clazz) {
+    <T> void provide(InjectionToken<T> token, Injectable<T> injectable) {
+	    this.injectables.put(token, injectable);
+	}
+
+	public <T> T inject(Class<T> clazz) {
     	return this.inject(new InjectionToken<>(clazz, ResolutionScope.CLASS));
     }
     
@@ -41,11 +44,7 @@ public class Injector {
     public <T> T injectOptional(InjectionToken<T> token) {
     	return this.inject(token, true, new ClassTrace());
     }
-    
-    <T> void provide(InjectionToken<T> token, Injectable<T> injectable) {
-        this.injectables.put(token, injectable);
-    }
-    
+        
     @SuppressWarnings("unchecked")
     <T> T inject(InjectionToken<T> token, boolean optional, ClassTrace classTrace) {
     	if (token == null) {
@@ -56,21 +55,46 @@ public class Injector {
         	if (optional) {
         		return null;
         	} else {
-        		throw new InjectionException(token.toString() + " not provided");        		
+        		throw new InjectionException(token.toString() + " not provided", classTrace);        		
         	}
         }
 		return (T) injectable.resolve(new ResolutionContext(classTrace));
     }
     
-    public class InjectionPoint<T> {
+    public void initialize(Object object) {
+    	this.initialize(object, new ResolutionContext(new ClassTrace()));
+    }
+    
+    void initialize(Object object, ResolutionContext resolutionContext) {
+    	if (object == null) {
+    		return;
+    	}
+    	for (Field field : object.getClass().getDeclaredFields()) {
+			Inject injectAnno = field.getAnnotation(Inject.class);
+			if (injectAnno == null) {
+				continue;
+			}
+			resolutionContext.classTrace.push(field.getClass());
+			field.setAccessible(true);
+			Object injected = inject(new InjectionToken<>(field.getType(), ResolutionScope.CLASS), false, resolutionContext.classTrace);
+			try {
+				field.set(object, injected);
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				throw new InjectionException(e);
+			}
+			resolutionContext.classTrace.pop();
+		}
+	}
+
+	public class InjectionPoint<T> {
     	
     	private final InjectionToken<T> token;
     	
-    	public InjectionPoint(InjectionToken<T> token) {
+    	InjectionPoint(InjectionToken<T> token) {
 			this.token = token;
     	}
     	
-    	@SuppressWarnings("rawtypes")
+    	@SuppressWarnings({ "rawtypes", "unchecked" })
 		public void provideClass(Class<? extends T> clazz) {
     		Injector.this.provide(this.token, new ClassInjectable(clazz));
     	}
@@ -78,11 +102,16 @@ public class Injector {
     	public void provideValue(T value) {
     		Injector.this.provide(this.token, new ValueInjectable<T>(value));
     	}
+    	
+    	@SuppressWarnings({ "unchecked", "rawtypes" })
+		public void provideInstanceOf(Class<? extends T> clazz) {
+    		Injector.this.provide(this.token, new InstanceInjectable(clazz));
+    	}
     }
     
     class ResolutionContext extends Injector {
     	
-    	ClassTrace classTrace = new ClassTrace();
+    	ClassTrace classTrace;
     	
     	ResolutionContext(ClassTrace classTrace) {
     		this.classTrace = classTrace;
@@ -93,7 +122,7 @@ public class Injector {
     	<T> T inject(InjectionToken<T> token, boolean optional, ClassTrace classTrace) {
     		Injectable<?> injectable = this.injectables.get(token);
     		if (injectable != null) {
-    			return (T) injectable.resolve(this);
+    			return (T) injectable.resolve(new ResolutionContext(classTrace));
     		}
     		return Injector.this.inject(token, optional, classTrace);
     	}

@@ -49,7 +49,7 @@ public class InjectorTest {
 	@Test
 	public void testProvideClassWithInstanceResolution() {
 		Injector injector = new Injector();
-		InjectionToken<StringBuilder> fileToken1 = new InjectionToken<>(StringBuilder.class, ResolutionScope.INSTANCE);
+		InjectionToken<StringBuilder> fileToken1 = new InjectionToken<>(StringBuilder.class, ResolutionScope.TOKEN);
 		injector.provide(fileToken1, new ClassInjectable<StringBuilder>(StringBuilder.class));
 		InjectionToken<StringBuilder> fileToken2 = new InjectionToken<>(StringBuilder.class, ResolutionScope.CLASS);
 		StringBuilder wronglyInjected = injector.inject(fileToken2, true, new ClassTrace());
@@ -61,7 +61,7 @@ public class InjectorTest {
 	@Test
 	public void testProvideValueWithInstanceResolution() {
 		Injector injector = new Injector();
-		InjectionToken<BigDecimal> bdToken1 = new InjectionToken<>(BigDecimal.class, ResolutionScope.INSTANCE);
+		InjectionToken<BigDecimal> bdToken1 = new InjectionToken<>(BigDecimal.class, ResolutionScope.TOKEN);
 		injector.provide(bdToken1, new ValueInjectable<BigDecimal>(BigDecimal.TEN));
 		InjectionToken<BigDecimal> bdToken2 = new InjectionToken<>(BigDecimal.class, ResolutionScope.CLASS);
 		BigDecimal wronglyInjected = injector.inject(bdToken2, true, new ClassTrace());

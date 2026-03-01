@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import dev.philipp.depen.CircularDependencyException;
 import dev.philipp.depen.Injector;
+import dev.philipp.example.ConstructorInjection.InjectedInjector;
 
 public class ConstructorInjection {
 
@@ -47,6 +48,14 @@ public class ConstructorInjection {
 		Injector injector = new Injector();
 		injector.provide(OneClassCircle.class);
 		injector.inject(OneClassCircle.class);
+	}
+	
+	@Test
+	public void testInjectorInjection() {
+		Injector injector = new Injector();
+		injector.provide(InjectedInjector.class);
+		InjectedInjector injectedInjector = injector.inject(InjectedInjector.class);
+		assertNotNull(injectedInjector);
 	}
 	
 	
@@ -99,6 +108,12 @@ public class ConstructorInjection {
 	public static class OneClassCircle {
 		public OneClassCircle(OneClassCircle me) {
 			
+		}
+	}
+	
+	public static class InjectedInjector {
+		public InjectedInjector(Injector injector) {
+			assertNotNull(injector);
 		}
 	}
 }

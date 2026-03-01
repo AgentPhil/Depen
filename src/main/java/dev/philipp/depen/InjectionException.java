@@ -19,4 +19,14 @@ public class InjectionException extends RuntimeException {
     InjectionException(Throwable cause) {
         super(cause);
     }
+    
+    InjectionException(String msg, Throwable cause, ClassTrace classTrace) {
+        super(msg + ": " + classTrace.toString(), cause);
+    }
+
+	public InjectionException(String msg, ClassTrace classTrace) {
+        super(msg + ": " + classTrace.toString());
+	}
+    
+    
 }
