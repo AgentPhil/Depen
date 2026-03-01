@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
+import dev.philipp.depen.CircularDependencyException;
 import dev.philipp.depen.Inject;
 import dev.philipp.depen.InjectionException;
 import dev.philipp.depen.Injector;
@@ -88,6 +89,16 @@ public class AnnotationInjection {
 		assertEquals(parent, parent.child2.parent);
 	}
 	
+	@Test(expected = CircularDependencyException.class)
+	public void testCircularDependency() {
+		Injector injector = new Injector();
+		injector.provide(A.class);
+		injector.provide(B.class);
+		injector.provide(C.class);
+		injector.provide(D.class);
+		injector.inject(A.class);
+	}
+	
 	public static class Service {
 		
 	}
@@ -122,5 +133,18 @@ public class AnnotationInjection {
 		public Child2(Parent parent) {
 			this.parent = parent;
 		}
-	}	
+	}
+	
+	public static class A {
+	    @Inject B b;
+	}
+	public static class B {
+	    @Inject C c;
+	}
+	public static class C {
+	    @Inject D d;
+	}
+	public static class D {
+	    @Inject A a;
+	}
 }
