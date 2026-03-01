@@ -69,27 +69,31 @@ public class Injector {
     	if (object == null) {
     		return;
     	}
+    	Provide[] provides = object.getClass().getAnnotationsByType(Provide.class);
+    	for (Provide provide : provides) {
+    		resolutionContext.provide(provide.value());
+    	}
+    	resolutionContext.classTrace.push(object.getClass());
     	for (Field field : object.getClass().getDeclaredFields()) {
-			Inject injectAnno = field.getAnnotation(Inject.class);
-			if (injectAnno == null) {
+			Inject inject = field.getAnnotation(Inject.class);
+			if (inject == null) {
 				continue;
 			}
-			resolutionContext.classTrace.push(field.getClass());
 			field.setAccessible(true);
 			Class<?> clazz;
-			if (injectAnno.value() != Object.class) {
-				clazz = injectAnno.value();
+			if (inject.value() != Object.class) {
+				clazz = inject.value();
 			} else {
 				clazz = field.getType();
 			}
-			Object injected = inject(new InjectionToken<>(clazz, ResolutionScope.CLASS), injectAnno.optional(), resolutionContext.classTrace);
+			Object injected = inject(new InjectionToken<>(clazz, ResolutionScope.CLASS), inject.optional(), resolutionContext.classTrace);
 			try {
 				field.set(object, injected);
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				throw new InjectionException(e);
 			}
-			resolutionContext.classTrace.pop();
 		}
+    	resolutionContext.classTrace.pop();
 	}
 
 	public class InjectionPoint<T> {

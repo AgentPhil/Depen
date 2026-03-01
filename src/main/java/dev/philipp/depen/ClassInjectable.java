@@ -49,12 +49,15 @@ public class ClassInjectable<T> extends Injectable<T> {
 					optional = injectAnno.optional();
 				}
 				params[i] = resolutionContext.inject(new InjectionToken<>(clazz, ResolutionScope.CLASS), optional, resolutionContext.classTrace);
-				resolutionContext.initialize(params[i], resolutionContext);
 			}
 			T newInstance = constructorOfChoice.newInstance(params);
-			resolutionContext.initialize(newInstance, resolutionContext);
 			resolutionContext.forClass(this.clazz).provideValue(newInstance);
+//			for (Object parameter : params) {
+//				//running param initialisation after self providing solves circular dependency problems, but leads to uninitialized params being passed to the constructor
+//				resolutionContext.initialize(parameter, resolutionContext);
+//			}
 			resolutionContext.classTrace.pop();
+			resolutionContext.initialize(newInstance, resolutionContext);
 			return newInstance;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
