@@ -15,6 +15,7 @@ public class InstanceInjectable <T> extends ClassInjectable<T> {
 		if (instance != null) {
 			return instance;
 		}
-		return super.resolve(resolutionContext);
+		this.instance = super.resolve(resolutionContext.new ResolutionContext(resolutionContext.classTrace));
+		return instance;
 	}
 }

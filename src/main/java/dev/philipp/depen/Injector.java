@@ -76,7 +76,13 @@ public class Injector {
 			}
 			resolutionContext.classTrace.push(field.getClass());
 			field.setAccessible(true);
-			Object injected = inject(new InjectionToken<>(field.getType(), ResolutionScope.CLASS), false, resolutionContext.classTrace);
+			Class<?> clazz;
+			if (injectAnno.value() != Object.class) {
+				clazz = injectAnno.value();
+			} else {
+				clazz = field.getType();
+			}
+			Object injected = inject(new InjectionToken<>(clazz, ResolutionScope.CLASS), injectAnno.optional(), resolutionContext.classTrace);
 			try {
 				field.set(object, injected);
 			} catch (IllegalArgumentException | IllegalAccessException e) {

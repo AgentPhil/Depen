@@ -1,13 +1,16 @@
 package dev.philipp.depen;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Retention(RUNTIME)
-@Target(FIELD)
+@Target({FIELD, PARAMETER})
 public @interface Inject {
-
+	Class<?> value() default Object.class;
+	
+	boolean optional() default false;
 }
