@@ -3,6 +3,7 @@ package dev.philipp.depen;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import dev.philipp.depen.InjectionToken.ResolutionScope;
 
@@ -116,6 +117,10 @@ public class Injector {
     	@SuppressWarnings({ "unchecked", "rawtypes" })
 		public void provideInstanceOf(Class<? extends T> clazz) {
     		Injector.this.provide(this.token, new InstanceInjectable(clazz));
+    	}
+    	
+		public void provideFactory(Function<Injector, ? extends T> factory) {
+    		Injector.this.provide(this.token, new FactoryInjectable<>(factory));
     	}
     }
     

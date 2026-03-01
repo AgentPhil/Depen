@@ -10,9 +10,6 @@ import dev.philipp.depen.Inject;
 import dev.philipp.depen.InjectionException;
 import dev.philipp.depen.Injector;
 import dev.philipp.depen.Provide;
-import dev.philipp.example.AnnotationInjection.App2;
-import dev.philipp.example.AnnotationInjection.Parent;
-import dev.philipp.example.AnnotationInjection.Service;
 
 public class AnnotationInjection {
 
@@ -87,9 +84,9 @@ public class AnnotationInjection {
 		Injector injector = new Injector();
 		injector.provide(Parent.class);
 		Parent parent = injector.inject(Parent.class);
-		
+		assertEquals(parent, parent.child1.parent);
+		assertEquals(parent, parent.child2.parent);
 	}
-	
 	
 	public static class Service {
 		
