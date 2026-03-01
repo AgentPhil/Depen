@@ -6,7 +6,7 @@ import java.lang.reflect.Parameter;
 import dev.philipp.depen.InjectionToken.ResolutionScope;
 import dev.philipp.depen.Injector.ResolutionContext;
 
-public class ClassInjectable<T> extends Injectable<T> {
+class ClassInjectable<T> extends Injectable<T> {
 
     private final Class<T> clazz;
 

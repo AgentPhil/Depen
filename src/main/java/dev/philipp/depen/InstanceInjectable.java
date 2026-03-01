@@ -2,7 +2,7 @@ package dev.philipp.depen;
 
 import dev.philipp.depen.Injector.ResolutionContext;
 
-public class InstanceInjectable <T> extends ClassInjectable<T> {
+class InstanceInjectable <T> extends ClassInjectable<T> {
 
 	private T instance = null;
 	

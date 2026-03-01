@@ -9,7 +9,7 @@ import java.util.Set;
  * The single purpose of this collection is to detect a circular dependency resolution at runtime.
  * The dependency injection would work without this, the only side effect is time
  */
-public class ClassTrace {
+class ClassTrace {
     private final Deque<Class<?>> stack = new ArrayDeque<>();
     private final Set<Class<?>> set = new HashSet<>();
 

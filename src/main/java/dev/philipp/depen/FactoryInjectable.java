@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import dev.philipp.depen.Injector.ResolutionContext;
 
-public class FactoryInjectable<T> extends Injectable<T> {
+class FactoryInjectable<T> extends Injectable<T> {
 
 	private Function<Injector, ? extends T> factory;
 

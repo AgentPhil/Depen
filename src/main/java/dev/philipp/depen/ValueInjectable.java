@@ -2,7 +2,7 @@ package dev.philipp.depen;
 
 import dev.philipp.depen.Injector.ResolutionContext;
 
-public class ValueInjectable<T> extends Injectable<T> {
+class ValueInjectable<T> extends Injectable<T> {
 
     private final T value;
 
